@@ -1,0 +1,28 @@
+stack_overflow:
+    page_size: 15
+    num_questions: 5
+    num_answers: 5
+question: "apply a function to a pandas column"
+summarization_pipeline:
+    _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
+    model_path: "Open-Orca/oo-phi-1_5"
+    chat_template: ${hydra:runtime.cwd}/chat_templates/chat_templates/chatml.jinja
+generation_params:
+    max_new_tokens: 200
+    do_sample: True
+    temperature: 0.5
+    top_p: 0.95
+    use_cache: True
+    repetition_penalty: 1.1
+prompt: |
+    Given a collection of StackOverflow answers related to [{}], please summarize the key points by doing the following:
+    
+        Identify and extract the most relevant code snippets related to the topic. Focus on those which question title is closest to the topic, have the biggest score and are freshest.
+        
+        Code snippets are delimited by the `||` characters. For example: `a = 1 || b = 2 || c = 3 ||`
+    
+        Use the answer body to determine which pieces of code are most relevant and to be used in your summary.
+    
+        Summarize the non-code advice that accompanies the code snippets in a few sentences.
+    
+        Make sure you don't repeat yourself.

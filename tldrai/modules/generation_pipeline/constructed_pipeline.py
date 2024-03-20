@@ -30,6 +30,9 @@ class ConstructedPipeline:
             # summarization_input,
             prompt,
             return_tensors="pt", return_attention_mask=False).to('cuda')
+
+        print("Prompt length: ", inputs['input_ids'].shape)
+
         outputs = self.model.generate(
             **inputs, max_new_tokens=max_new_tokens,
             do_sample=do_sample,
@@ -40,4 +43,4 @@ class ConstructedPipeline:
             # can try to uncomment this if model doesn't end
             # eos_token_id=tokenizer.eos_token_id
         )
-        return self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        return self.tokenizer.batch_decode(outputs, skip_special_tokens=True), outputs.shape

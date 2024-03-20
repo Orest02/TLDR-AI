@@ -3,6 +3,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from bs4 import BeautifulSoup
 
 from tldrai.modules.similarity_scoring.sentence_similarity import SentenceSimilarity
 
@@ -24,6 +25,22 @@ def preprocess_answer(answer):
     code_snippets = "\n".join(code_blocks)
     # Prepend code to the answer body to emphasize it
     return f"[Code]\n{code_snippets}\n[/Code]\n\n{answer}"
+
+
+# Function to extract and merge code blocks
+def extract_and_merge_code_blocks(html_content, delimiter=' || '):
+    soup = BeautifulSoup(html_content, 'lxml')
+
+    # Find all code blocks
+    code_blocks = soup.find_all('code')
+
+    # Extract text from code blocks
+    code_texts = [code.get_text(strip=True) for code in code_blocks if code]
+
+    # Merge code blocks with a delimiter
+    merged_code = delimiter.join(code_texts)
+
+    return merged_code
 
 
 def process_answers(answers, questions, user_question):
@@ -57,6 +74,7 @@ def process_answers(answers, questions, user_question):
             'last_activity_date': last_activity_date,
             'score': score,
             'is_accepted': is_accepted,
+            'code': extract_and_merge_code_blocks(answer['body']),
             'body': preprocess_answer(answer['body'])
         })
     return processed
