@@ -13,7 +13,7 @@ generation_params:
     temperature: 0.5
     top_p: 0.95
     use_cache: True
-    repetition_penalty: 1.1
+    repetition_penalty: 11
 prompt: |
     Given a collection of StackOverflow answers related to [{}], please summarize the key points by doing the following:
     

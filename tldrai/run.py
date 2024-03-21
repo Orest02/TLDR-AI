@@ -1,9 +1,10 @@
 import datetime
 import os
 
+import git
 import hydra
 import wandb
-from omegaconf import DictConfig
+from omegaconf import DictConfig, omegaconf
 from stackapi import StackAPI
 
 from modules.generation_pipeline.constructed_pipeline import ConstructedPipeline
@@ -19,7 +20,14 @@ from wandb.sdk.data_types.trace_tree import Trace
 def main(cfg: DictConfig):
     # Initialize StackAPI with Hydra config
     start_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+
+    wandb.config = omegaconf.OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
+
+    wandb.init(project="tldr-ai")
     SITE = StackAPI('stackoverflow')
+    repo = git.Repo(search_parent_directories=True)
     SITE.page_size = cfg.stack_overflow.page_size
 
     question = cfg.question
@@ -50,14 +58,15 @@ def main(cfg: DictConfig):
     summarization_input = prompt + summarization_input + "\nSummary:"
     generation_params = cfg.generation_params
     try:
-        summary, token_shape = summarizer.run(codified_prompt, **generation_params)
+        summary, input_len, token_shape = summarizer.run(codified_prompt, **generation_params)
         print("Summary:", summary[0])
         end_time_ms = round(
             datetime.datetime.now().timestamp() * 1000
         )
         status = "success"
         status_message = (None,)
-        token_usage = token_shape[0]
+        token_usage = token_shape[1]
+        output = summary[0][input_len:]
     except Exception as e:
         end_time_ms = round(
             datetime.datetime.now().timestamp() * 1000
@@ -66,7 +75,25 @@ def main(cfg: DictConfig):
         status_message = str(e)
         token_usage = 0
         summary = ''
+        output = ''
+        input_len = 0
 
+    run_params = dict(
+        **generation_params,
+        **cfg.stack_overflow,
+        **cfg.summarization_pipeline,
+        prompt=cfg.prompt,
+        fetch_time_ms=fetch_time_ms,
+        process_time_ms=process_time_ms,
+        token_usage=token_usage,
+        git_hash=repo.head.object.hexsha,
+        success=True if status == "success" else False,
+        output='' if status == "error" else output,
+        question=question
+    )
+
+    # for key, param in run_params.items():
+    #     wandb.log(key, param)
 
     # create a span in wandb
     root_span = Trace(
@@ -74,8 +101,7 @@ def main(cfg: DictConfig):
         kind="llm",  # kind can be "llm", "chain", "agent" or "tool"
         status_code=status,
         status_message=status_message,
-        metadata=dict(**generation_params, **cfg.stack_overflow, **cfg.summarization_pipeline, prompt=cfg.prompt,
-                      fetch_time_ms=fetch_time_ms, process_time_ms=process_time_ms, token_usage=token_usage),
+        metadata=run_params,
         start_time_ms=start_time_ms,
         end_time_ms=end_time_ms,
         inputs={"system_prompt": system_prompt, "query": summarization_input},
@@ -84,10 +110,12 @@ def main(cfg: DictConfig):
 
     root_span.log(name="openai_trace")
 
+    wandb.log(run_params)
+    wandb.config.update(run_params)
+
 
 if __name__ == "__main__":
     wandb_key = open("keys/WANDB_KEY").read()
     os.environ["WANDB_API_KEY"] = wandb_key
 
-    wandb.init(project="tldr-ai")
     main()

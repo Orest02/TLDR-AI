@@ -33,6 +33,7 @@ lxml = "^5.1.0"
 
 [tool.poetry.group.wandb_experiment_tracking.dependencies]
 wandb = "^0.16.4"
+gitpython = "^3.1.42"
 
 [build-system]
 requires = ["poetry-core"]
