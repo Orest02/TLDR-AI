@@ -47,7 +47,9 @@ def main(cfg: DictConfig):
     answers = fetch_answers_for_questions(SITE, question_ids, num_answers=cfg.stack_overflow.num_answers)
     fetch_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     processed_answers = process_answers(answers['items'], questions, question)
-    summarization_input = prepare_summarization_input(processed_answers, n=5)
+    summarization_input = prepare_summarization_input(processed_answers, n=5,
+                                                      max_new_tokens=cfg.generation_params.max_new_tokens,
+                                                      token_limit=2048)
 
     process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     codified_prompt = [
@@ -93,7 +95,8 @@ def main(cfg: DictConfig):
         output='' if status == "error" else output,
         question=question,
         status_message=status_message,
-        inference_time_ms=end_time_ms-process_time_ms,
+        inference_time_ms=end_time_ms - process_time_ms,
+        summarization_input=summarization_input
     )
 
     # for key, param in run_params.items():

@@ -2,7 +2,7 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-question: "transpose torch tensor"
+question: "flatten python list of lists"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
     model_path: "Open-Orca/oo-phi-1_5"
@@ -19,7 +19,7 @@ prompt: |
 
         Identify and extract the most relevant code snippets related to the topic. Focus on those which question title is closest to the topic, have the biggest score and are freshest.
     
-        Provide a concise summary for each code snippet. This summary should briefly explain:
+        Provide a concise summary for each code snippet you provide. This summary should briefly explain:
             The purpose of the code: What problem does it solve or what functionality does it provide?
             How the code works: A very brief overview of the logic or method used.
             Any important notes or warnings: Include if the code requires specific versions, dependencies, or if there are common pitfalls.
