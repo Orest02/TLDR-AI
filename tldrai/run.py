@@ -85,14 +85,15 @@ def main(cfg: DictConfig):
         **cfg.stack_overflow,
         **cfg.summarization_pipeline,
         prompt=cfg.prompt,
-        fetch_time_ms=fetch_time_ms,
-        process_time_ms=process_time_ms,
+        fetch_time_ms=fetch_time_ms - start_time_ms,
+        process_time_ms=process_time_ms - fetch_time_ms,
         token_usage=token_usage,
         git_hash=repo.head.object.hexsha,
         success=True if status == "success" else False,
         output='' if status == "error" else output,
         question=question,
-        status_message=status_message
+        status_message=status_message,
+        inference_time_ms=end_time_ms-process_time_ms,
     )
 
     # for key, param in run_params.items():

@@ -10,10 +10,10 @@ summarization_pipeline:
 generation_params:
     max_new_tokens: 200
     do_sample: True
-    temperature: 0.5
+    temperature: 10.0
     top_p: 0.95
-    use_cache: True
-    repetition_penalty: 11
+    use_cache: False
+    repetition_penalty: 1.5
 prompt: |
     Given a collection of StackOverflow answers related to [{}], please summarize the key points by doing the following:
     
@@ -25,4 +25,4 @@ prompt: |
     
         Summarize the non-code advice that accompanies the code snippets in a few sentences.
     
-        Make sure you don't repeat yourself.
+        Make sure you don't repeat yourself. Make it short.
