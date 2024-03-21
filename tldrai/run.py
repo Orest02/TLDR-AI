@@ -78,6 +78,8 @@ def main(cfg: DictConfig):
         output = ''
         input_len = 0
 
+        print("Error:", status, status_message)
+
     run_params = dict(
         **generation_params,
         **cfg.stack_overflow,
@@ -89,7 +91,8 @@ def main(cfg: DictConfig):
         git_hash=repo.head.object.hexsha,
         success=True if status == "success" else False,
         output='' if status == "error" else output,
-        question=question
+        question=question,
+        status_message=status_message
     )
 
     # for key, param in run_params.items():
