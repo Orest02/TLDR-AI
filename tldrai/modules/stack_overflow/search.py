@@ -8,8 +8,10 @@ def search_stack_overflow_questions(api, query, tag='', num_questions=3, search_
         else:
             questions = api.fetch('search', intitle=query, sort='relevance', pagesize=num_questions)
     elif search_style == 'excerpts':
-        questions = api.fetch('search/excerpts', q=query, body=query, sort='relevance', pagesize=num_questions)
+        questions = api.fetch('search/excerpts', q=query, sort='relevance', pagesize=num_questions)
     else:
         raise ArgumentError(f'Unknown search_style {search_style}. Currently "simple" and "excerpts" are supported')
     print("Questions: ", questions)
+    if not questions['items']:
+        raise RuntimeError("No questions found for the query. try rephrasing and searching again")
     return questions['items']

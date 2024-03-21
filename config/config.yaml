@@ -2,7 +2,7 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-question: "apply a function to a pandas column"
+question: "transpose torch tensor"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
     model_path: "Open-Orca/oo-phi-1_5"
@@ -10,19 +10,22 @@ summarization_pipeline:
 generation_params:
     max_new_tokens: 200
     do_sample: True
-    temperature: 10.0
+    temperature: 0.3
     top_p: 0.95
-    use_cache: False
+    use_cache: True
     repetition_penalty: 1.5
 prompt: |
     Given a collection of StackOverflow answers related to [{}], please summarize the key points by doing the following:
-    
+
         Identify and extract the most relevant code snippets related to the topic. Focus on those which question title is closest to the topic, have the biggest score and are freshest.
-        
-        Code snippets are delimited by the `||` characters. For example: `a = 1 || b = 2 || c = 3 ||`
     
-        Use the answer body to determine which pieces of code are most relevant and to be used in your summary.
+        Provide a concise summary for each code snippet. This summary should briefly explain:
+            The purpose of the code: What problem does it solve or what functionality does it provide?
+            How the code works: A very brief overview of the logic or method used.
+            Any important notes or warnings: Include if the code requires specific versions, dependencies, or if there are common pitfalls.
     
-        Summarize the non-code advice that accompanies the code snippets in a few sentences.
+        Highlight any variations or alternatives in the code snippets that might be useful for different scenarios or preferences.
     
-        Make sure you don't repeat yourself. Make it short.
+        Summarize the non-code advice that accompanies the code snippets in a few sentences. Focus on tips, best practices, or explanations that are frequently mentioned or highly valued by the community.
+
+    Please ensure the summary is clear, to the point, and accessible to someone with a basic understanding of the topic.

@@ -11,6 +11,9 @@ from tldrai.modules.similarity_scoring.sentence_similarity import SentenceSimila
 def process_questions(questions):
     ret_questions = []
 
+    if not questions:
+        raise RuntimeError("No questions to process")
+
     for question in questions:
         if question.get('closed_reason') == 'Duplicate':
             continue
