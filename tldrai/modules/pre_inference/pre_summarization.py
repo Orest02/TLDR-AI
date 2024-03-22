@@ -13,4 +13,4 @@ def prepare_summarization_input(processed_answers, n=3, max_new_tokens=200, toke
 
         combined_text += answer_info
 
-    return combined_text + "<<<END OF LISTED ANSWERS>>>"
+    return combined_text

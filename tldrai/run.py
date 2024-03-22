@@ -37,7 +37,7 @@ def main(cfg: DictConfig):
 
     system_prompt = cfg.prompt.format(question)
 
-    prompt = system_prompt + "STACKOVERFLOW ANSWERS:\n"
+    prompt = system_prompt
 
     # Fetch and preprocess data
     questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
