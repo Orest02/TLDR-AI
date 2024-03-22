@@ -58,7 +58,6 @@ def process_answers(answers, questions, user_question):
     processed = []
     for _, answer in answers.sort_values(by="similarity", ascending=False).iterrows():
         # Convert creation date from epoch time to a readable format
-        print(answer['creation_date'], type(answer['creation_date']))
         if not np.isnan(answer['creation_date']):
             creation_date = datetime.fromtimestamp(int(answer['creation_date'])).strftime('%Y-%m-%d')
         else:

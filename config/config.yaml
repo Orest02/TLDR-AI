@@ -19,5 +19,5 @@ prompt: |
     Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code.
 prompt_ending: |
     
-    How do I {}?
+    What's the proper code to {}?
 is_prompt_codified: True
