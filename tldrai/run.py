@@ -49,16 +49,16 @@ def main(cfg: DictConfig):
     processed_answers = process_answers(answers['items'], questions, question)
     summarization_input = prepare_summarization_input(processed_answers, n=5,
                                                       max_new_tokens=cfg.generation_params.max_new_tokens,
-                                                      token_limit=2048)
+                                                      token_limit=cfg.model_token_limit)
 
     process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     if cfg.is_prompt_codified:
         summarization_input = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": summarization_input + cfg.prompt_ending}
+            {"role": "user", "content": summarization_input + cfg.prompt_ending.format(question)}
         ]
     else:
-        summarization_input = prompt + summarization_input + cfg.prompt_ending
+        summarization_input = prompt + summarization_input + cfg.prompt_ending.format(question)
 
     generation_params = cfg.generation_params
     try:
