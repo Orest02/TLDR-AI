@@ -52,15 +52,17 @@ def main(cfg: DictConfig):
                                                       token_limit=2048)
 
     process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    codified_prompt = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": summarization_input}
-    ]
+    if cfg.is_prompt_codified:
+        summarization_input = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": summarization_input + cfg.prompt_ending}
+        ]
+    else:
+        summarization_input = prompt + summarization_input + cfg.prompt_ending
 
-    summarization_input = prompt + summarization_input + "\nSummary:"
     generation_params = cfg.generation_params
     try:
-        summary, input_len, token_shape = summarizer.run(codified_prompt, **generation_params)
+        summary, input_len, token_shape = summarizer.run(summarization_input, **generation_params)
         print("Summary:", summary[0])
         end_time_ms = round(
             datetime.datetime.now().timestamp() * 1000
@@ -96,7 +98,9 @@ def main(cfg: DictConfig):
         question=question,
         status_message=status_message,
         inference_time_ms=end_time_ms - process_time_ms,
-        summarization_input=summarization_input
+        summarization_input=summarization_input,
+        prompt_ending=cfg.prompt_ending,
+        is_prompt_codified=cfg.is_prompt_codified
     )
 
     # for key, param in run_params.items():
