@@ -2,22 +2,22 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-question: "flatten python list of lists"
+question: "sort python list"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
-    model_path: "Open-Orca/oo-phi-1_5" #"smallcloudai/Refact-1_6B-fim"
-    chat_template: ${hydra:runtime.cwd}/chat_templates/chat_templates/chatml.jinja
+    model_path: "smallcloudai/Refact-1_6B-fim" #"Open-Orca/oo-phi-1_5" #
+    chat_template: #${hydra:runtime.cwd}/chat_templates/chat_templates/chatml.jinja
 generation_params:
     max_new_tokens: 200
     do_sample: True
-    temperature: 0.5
+    temperature: 0.2
     top_p: 0.95
     use_cache: True
-    repetition_penalty: 2.5
-model_token_limit: 2048
+    repetition_penalty: 5.5
+model_token_limit: 4096
 prompt: |
-    Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code.
+    Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code. Give it as it is even if you think it's not correct.
 prompt_ending: |
     
-    What's the proper code to {}?
-is_prompt_codified: True
+    So, how do I {}?
+is_prompt_codified: False

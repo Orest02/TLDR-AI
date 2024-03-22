@@ -52,9 +52,7 @@ def process_answers(answers, questions, user_question):
     answers = pd.merge(answers, questions["title"], left_on="question_id", right_index=True)
     print(answers)
     similarity = (SentenceSimilarity().compare_base_to_others(base_sentence=user_question, other_sentences=answers["title"].tolist())).numpy()
-    print("similarity: ", similarity)
     answers["similarity"] = similarity[0]
-    print("Question ids: ", questions.index)
     processed = []
     for _, answer in answers.sort_values(by="similarity", ascending=False).iterrows():
         # Convert creation date from epoch time to a readable format
