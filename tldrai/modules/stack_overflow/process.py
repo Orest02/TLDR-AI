@@ -38,7 +38,7 @@ def extract_and_merge_code_blocks(html_content, delimiter=' || '):
     code_blocks = soup.find_all('code')
 
     # Extract text from code blocks
-    code_texts = [code.get_text(strip=True) for code in code_blocks if code]
+    code_texts = ['\n' + code.get_text(strip=True) for code in code_blocks if code]
 
     # Merge code blocks with a delimiter
     merged_code = delimiter.join(code_texts)
