@@ -8,18 +8,20 @@ summarization_pipeline:
     model_path: "Open-Orca/oo-phi-1_5" #
     chat_template: ${hydra:runtime.cwd}/chat_templates/chat_templates/chatml.jinja
 generation_params:
-    max_new_tokens: 300
+    max_new_tokens: 400
+    attention_mask: True
     do_sample: True
-    temperature: 0.2
+    temperature: 0.3
     top_p: 0.95
     use_cache: True
-    repetition_penalty: 55.0
+    repetition_penalty: 10.1
 model_token_limit: 2048
+precision:
+    _target_: torch.bfloat16
 history:
     system: |
-        Given a collection of StackOverflow answers related to [sort python list], please extract the most relevant piece of code. Give it as it is even if you think it's not correct.
+        Given a collection of StackOverflow answers related to a user request, please extract the most relevant piece of code.
     user: |
-        <<<START OF LISTED ANSWERS>>>
         Answer 1:
         question_title: Python list sort in descending order
         creation_date: 2010-11-15
@@ -27,8 +29,12 @@ history:
         score: 571
         is_accepted: False
         code: 
-        sorted(timestamps, reverse=True) || 
+        ```
+        sorted(timestamps, reverse=True)
+        ```
+        ```
         timestamps.sort(reverse=True)
+        ```
         body: <p>This will give you a sorted version of the array.</p>
         <pre><code>sorted(timestamps, reverse=True)
         </code></pre>
@@ -44,13 +50,21 @@ history:
         score: 427
         is_accepted: True
         code: 
-        lambda || 
-        timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True) || 
-        list.sort || 
+        ```
+        lambda 
+        ```
+        ```
+        timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True) 
+        ```
+        ```
+        list.sort
+        ```
+        ```
         def foo(x):
             return time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6]
         
         timestamps.sort(key=foo, reverse=True)
+        ```
         body: <p>In one line, using a <code>lambda</code>:</p>
         <pre><code>timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True)
         </code></pre>
@@ -69,13 +83,15 @@ history:
         score: 460
         is_accepted: False
         code: 
-        list || 
+        ```
+        list
+        ```
         sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
+        ```
         body: <p>No need to import anything when using lambda functions.<br />
         The following sorts <code>list</code> by the first element, then by the second element. You can also sort by one field ascending and another descending for example:</p>
         <pre class="lang-py prettyprint-override"><code>sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
         </code></pre>
-        <<<END OF LISTED ANSWERS>>>
         
         
         So, how do I sort python list?

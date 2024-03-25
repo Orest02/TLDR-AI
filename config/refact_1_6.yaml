@@ -9,11 +9,12 @@ summarization_pipeline:
     chat_template: null #${hydra:runtime.cwd}/chat_templates/chat_templates/chatml.jinja
 generation_params:
     max_new_tokens: 300
+    attention_mask: True
     do_sample: True
     temperature: 0.2
     top_p: 0.95
-    use_cache: False
-    repetition_penalty: 55.0
+    use_cache: True
+    repetition_penalty: 5.0
 model_token_limit: 4096
 history:
     system: |
@@ -27,8 +28,12 @@ history:
         score: 571
         is_accepted: False
         code: 
-        sorted(timestamps, reverse=True) || 
+        ```
+        sorted(timestamps, reverse=True)
+        ```
+        ```
         timestamps.sort(reverse=True)
+        ```
         body: <p>This will give you a sorted version of the array.</p>
         <pre><code>sorted(timestamps, reverse=True)
         </code></pre>
@@ -44,13 +49,20 @@ history:
         score: 427
         is_accepted: True
         code: 
-        lambda || 
-        timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True) || 
-        list.sort || 
+        ```
+        lambda 
+        ```
+        ```
+        timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True) ```
+        ```
+        list.sort 
+        ```
+        ```
         def foo(x):
             return time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6]
         
         timestamps.sort(key=foo, reverse=True)
+        ```
         body: <p>In one line, using a <code>lambda</code>:</p>
         <pre><code>timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True)
         </code></pre>
@@ -69,8 +81,12 @@ history:
         score: 460
         is_accepted: False
         code: 
-        list || 
+        ```
+        list 
+        ```
+        ```
         sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
+        ```
         body: <p>No need to import anything when using lambda functions.<br />
         The following sorts <code>list</code> by the first element, then by the second element. You can also sort by one field ascending and another descending for example:</p>
         <pre class="lang-py prettyprint-override"><code>sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
@@ -90,7 +106,7 @@ history:
         ```
         <|endoftext|>
 prompt: |
-    <empty_output>SYSTEM Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code. Give it as it is even if you think it's not correct.
+    <empty_output>SYSTEM Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code. Give it as it is even if you think it's not correct. Start your answer with code. The non-code answer should be as short as possible.
     <empty_output>USER
 prompt_ending: |
     

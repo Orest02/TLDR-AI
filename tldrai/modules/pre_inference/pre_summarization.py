@@ -1,5 +1,5 @@
 def prepare_summarization_input(processed_answers, n=3, max_new_tokens=200, token_limit=2048, history_len=0):
-    combined_text = "<<<START OF LISTED ANSWERS>>>\n"
+    combined_text = ""#"<<<START OF LISTED ANSWERS>>>\n"
 
     # Combine answers, or select top n
     for count, answer in enumerate(processed_answers):

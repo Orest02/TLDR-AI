@@ -31,7 +31,7 @@ def preprocess_answer(answer):
 
 
 # Function to extract and merge code blocks
-def extract_and_merge_code_blocks(html_content, delimiter=' || '):
+def extract_and_merge_code_blocks(html_content, delimiter='```\n```', delimiter_wrap='```'):
     soup = BeautifulSoup(html_content, 'lxml')
 
     # Find all code blocks
@@ -42,6 +42,9 @@ def extract_and_merge_code_blocks(html_content, delimiter=' || '):
 
     # Merge code blocks with a delimiter
     merged_code = delimiter.join(code_texts)
+
+    if delimiter_wrap:
+        merged_code = delimiter + merged_code + delimiter
 
     return merged_code
 
