@@ -89,8 +89,7 @@ history:
         ```
         timestamps.sort(reverse=True)
         ```
-prompt: |
-    Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code. Give it as it is even if you think it's not correct.
+prompt: null
 prompt_ending: |
     
     So, how do I {}?

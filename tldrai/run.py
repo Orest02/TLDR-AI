@@ -35,9 +35,7 @@ def main(cfg: DictConfig):
     # Initialize summarization pipeline
     summarizer = hydra.utils.instantiate(cfg.summarization_pipeline)
 
-    system_prompt = cfg.prompt.format(question)
-
-    prompt = system_prompt
+    system_prompt = '' if not cfg.prompt else cfg.prompt.format(question)
 
     # Fetch and preprocess data
     questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
@@ -55,20 +53,7 @@ def main(cfg: DictConfig):
                                                       )
 
     process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    if cfg.is_prompt_codified:
-        summarization_input = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": summarization_input + cfg.prompt_ending.format(question)}
-        ]
-
-        if cfg.history:
-            history = [{"role": key, "content": value} for key, value in cfg.history.items()]
-            summarization_input = history + summarization_input
-    else:
-        summarization_input = prompt + summarization_input + cfg.prompt_ending.format(question)
-
-        if cfg.history:
-            summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
+    summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
 
     generation_params = cfg.generation_params
     try:
@@ -133,6 +118,32 @@ def main(cfg: DictConfig):
 
     wandb.log(run_params)
     wandb.config.update(run_params)
+
+
+def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt):
+    user_content = summarization_input + cfg.prompt_ending.format(question)
+
+    if cfg.is_prompt_codified:
+        if cfg.prompt:
+
+            summarization_input = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content}
+            ]
+        else:
+            summarization_input = [
+                {"role": "user", "content": user_content}
+            ]
+
+        if cfg.history:
+            history = [{"role": key, "content": value} for key, value in cfg.history.items()]
+            summarization_input = history + summarization_input
+    else:
+        summarization_input = system_prompt + user_content
+
+        if cfg.history:
+            summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
+    return summarization_input
 
 
 if __name__ == "__main__":
