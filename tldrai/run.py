@@ -47,9 +47,12 @@ def main(cfg: DictConfig):
     answers = fetch_answers_for_questions(SITE, question_ids, num_answers=cfg.stack_overflow.num_answers)
     fetch_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     processed_answers = process_answers(answers['items'], questions, question)
+    history_len = 0 if cfg.history is None else len(cfg.history)
     summarization_input = prepare_summarization_input(processed_answers, n=5,
                                                       max_new_tokens=cfg.generation_params.max_new_tokens,
-                                                      token_limit=cfg.model_token_limit)
+                                                      token_limit=cfg.model_token_limit,
+                                                      history_len=history_len
+                                                      )
 
     process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     if cfg.is_prompt_codified:
@@ -57,8 +60,15 @@ def main(cfg: DictConfig):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": summarization_input + cfg.prompt_ending.format(question)}
         ]
+
+        if cfg.history:
+            history = [{"role": key, "content": value} for key, value in cfg.history.items()]
+            summarization_input = history + summarization_input
     else:
         summarization_input = prompt + summarization_input + cfg.prompt_ending.format(question)
+
+        if cfg.history:
+            summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
 
     generation_params = cfg.generation_params
     try:
