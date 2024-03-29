@@ -10,7 +10,8 @@ class ConstructedPipeline:
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16)
 
         if chat_template is not None:
-            self.change_chat_template(chat_template)
+            if chat_template != 'default':
+                self.change_chat_template(chat_template)
 
         self.chat_template = chat_template
 
