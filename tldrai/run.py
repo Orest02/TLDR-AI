@@ -57,7 +57,8 @@ def main(cfg: DictConfig):
                                                           )
 
         process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-        summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
+
+    summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
 
     generation_params = cfg.generation_params
     try:
