@@ -42,6 +42,8 @@ class ConstructedPipeline:
             top_p=top_p,
             use_cache=use_cache,
             repetition_penalty=repetition_penalty,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
             **kwargs
             # can try to uncomment this if model doesn't end
             # eos_token_id=tokenizer.eos_token_id

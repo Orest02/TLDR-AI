@@ -38,22 +38,26 @@ def main(cfg: DictConfig):
     system_prompt = '' if not cfg.prompt else cfg.prompt.format(question)
 
     # Fetch and preprocess data
-    questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
-    questions = process_questions(questions)
-    question_ids = [str(x['question_id']) for x in questions]
+    if cfg.no_search:
+        summarization_input = ''
+        fetch_time_ms = process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+    else:
+        questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
+        questions = process_questions(questions)
+        question_ids = [str(x['question_id']) for x in questions]
 
-    answers = fetch_answers_for_questions(SITE, question_ids, num_answers=cfg.stack_overflow.num_answers)
-    fetch_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    processed_answers = process_answers(answers['items'], questions, question)
-    history_len = 0 if cfg.history is None else len(cfg.history)
-    summarization_input = prepare_summarization_input(processed_answers, n=5,
-                                                      max_new_tokens=cfg.generation_params.max_new_tokens,
-                                                      token_limit=cfg.model_token_limit,
-                                                      history_len=history_len
-                                                      )
+        answers = fetch_answers_for_questions(SITE, question_ids, num_answers=cfg.stack_overflow.num_answers)
+        fetch_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+        processed_answers = process_answers(answers['items'], questions, question)
+        history_len = 0 if cfg.history is None else len(cfg.history)
+        summarization_input = prepare_summarization_input(processed_answers, n=5,
+                                                          max_new_tokens=cfg.generation_params.max_new_tokens,
+                                                          token_limit=cfg.model_token_limit,
+                                                          history_len=history_len
+                                                          )
 
-    process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
+        process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+        summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
 
     generation_params = cfg.generation_params
     try:
