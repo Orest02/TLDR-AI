@@ -20,7 +20,7 @@ precision:
     _target_: torch.bfloat16
 history:
     system: |
-        Given a collection of StackOverflow answers related to a user request, please extract the most relevant piece of code.
+        Given a collection of StackOverflow answers related to [sort python list], please extract the most relevant piece of code.
     user: |
         Answer 1:
         question_title: Python list sort in descending order
@@ -105,7 +105,7 @@ history:
         ```
         timestamps.sort(reverse=True)
         ```
-prompt: null
+prompt: Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code.
 prompt_ending: |
     
     So, how do I {}?
