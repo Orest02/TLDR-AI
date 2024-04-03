@@ -15,7 +15,7 @@ generation_params:
     top_p: 0.95
     use_cache: True
     repetition_penalty: 1.1
-model_token_limit: 16383
+model_token_limit: 16384
 precision:
     _target_: torch.bfloat16
 history:
