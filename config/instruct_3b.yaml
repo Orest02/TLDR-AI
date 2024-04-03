@@ -2,7 +2,7 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-no_search: True
+no_search: False
 question: "apply a function to pandas column"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
