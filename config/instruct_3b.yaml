@@ -17,8 +17,7 @@ generation_params:
     use_cache: True
     repetition_penalty: 1.1
 model_token_limit: 16384
-precision:
-    dtype: torch.bfloat16
+precision: bfloat16
 history:
     system: |
         Given a collection of StackOverflow answers related to [sort python list], please extract the most relevant piece of code.
