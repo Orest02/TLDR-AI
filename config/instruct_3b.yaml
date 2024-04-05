@@ -8,7 +8,7 @@ summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.constructed_pipeline.ConstructedPipeline
     model_path: "stabilityai/stable-code-instruct-3b" #
     chat_template: default
-    dtype: $precision
+    dtype: ${precision}
 generation_params:
     max_new_tokens: 400
     do_sample: True
