@@ -3,10 +3,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class ConstructedPipeline:
-    def __init__(self, model_path, device="cuda", chat_template=None, dtype=torch.bfloat16):
+    def __init__(self, model_path, device="cuda", chat_template=None, dtype='bfloat16'):
         self.model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True,
                                                           torch_dtype=dtype).to(
             device)
+        dtype = getattr(torch, dtype)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, torch_dtype=dtype)
 
         if chat_template is not None:
