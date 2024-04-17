@@ -5,7 +5,7 @@ stack_overflow:
 no_search: False
 question: "apply a function to pandas column"
 summarization_pipeline:
-    _target_: tldrai.modules.generation_pipeline.constructed_pipeline.GGUFModelLoader
+    _target_: tldrai.modules.generation_pipeline.gguf_pipeline.GGUFModelLoader
     repo_id: "TheBloke/stable-code-3b-GGUF" #
     model_path: stable-code-3b.Q4_K_M.gguf
     chat_format: chatml
