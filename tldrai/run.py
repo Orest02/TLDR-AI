@@ -84,6 +84,7 @@ def main(cfg: DictConfig):
         input_len = 0
 
         print("Error:", status, status_message)
+        raise
 
     run_params = dict(
         **generation_params,
