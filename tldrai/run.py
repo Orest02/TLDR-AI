@@ -50,8 +50,9 @@ def main(cfg: DictConfig):
         fetch_time_ms = round(datetime.datetime.now().timestamp() * 1000)
         processed_answers = process_answers(answers['items'], questions, question)
         history_len = 0 if cfg.history is None else len(cfg.history)
+        max_new_tokens = cfg.get('max_new_tokens', 0)
         summarization_input = prepare_summarization_input(processed_answers, n=5,
-                                                          max_new_tokens=cfg.generation_params.max_new_tokens,
+                                                          max_new_tokens=max_new_tokens,
                                                           token_limit=cfg.model_token_limit,
                                                           history_len=history_len
                                                           )
