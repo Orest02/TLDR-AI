@@ -50,4 +50,11 @@ class GGUFModelLoader:
         return self.model.create_chat_completion(messages=messages)
 
     def run(self, prompt, **gen_params):
-        return self.model.create_chat_completion(messages=prompt, **gen_params)
+        outputs = self.model.create_chat_completion(messages=prompt, **gen_params)
+
+        answer = outputs['choices'][0]
+        content = answer['message']['content']
+        input_len = outputs['usage']['prompt_tokens']
+        token_shape = (None, outputs['usage']['total_tokens'])  # tuple to match the other pipeline types outputs
+
+        return content, input_len, token_shape
