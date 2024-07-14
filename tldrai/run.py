@@ -65,6 +65,7 @@ def main(cfg: DictConfig):
     try:
         summary, input_len, token_shape = summarizer.run(summarization_input, **generation_params)
         print("Summary:", summary[0])
+        print("All Summary:", summary)
         end_time_ms = round(
             datetime.datetime.now().timestamp() * 1000
         )
