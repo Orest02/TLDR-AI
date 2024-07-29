@@ -1,5 +1,7 @@
 from sentence_transformers import util, SentenceTransformer
 
+from tldrai.modules.utils.gpu import check_gpu_memory
+
 
 class SentenceSimilarity:
     def __init__(self, model_name='sentence-transformers/all-MiniLM-L6-v2'):
@@ -9,7 +11,11 @@ class SentenceSimilarity:
         Args:
             model_name (str): The name of the sentence transformer model to be used. Defaults to 'sentence-transformers/all-MiniLM-L6-v2'.
         """
-        self.model = SentenceTransformer(model_name)
+        self.model_memory_used = 0.5  # GB
+        free_memory = check_gpu_memory()
+
+        device = "cuda" if free_memory >= self.model_memory_used else "cpu"
+        self.model = SentenceTransformer(model_name, device=device)
 
     def encode_sentences(self, sentences):
         """

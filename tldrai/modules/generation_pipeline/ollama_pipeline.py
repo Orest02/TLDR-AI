@@ -1,48 +1,68 @@
+import logging
+
 import ollama
+import time
+import threading
+import itertools
 
 class OllamaPipeline:
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, model, stream_responses=True):
+        self.model = model + ":latest"
+        self.stream_responses = stream_responses
         self.check_and_pull_model()
 
     def check_and_pull_model(self):
-        try:
-            models = ollama.list()
-            if self.model not in [model['name'] for model in models['models']]:
-                self.pull_model()
-        except ollama._types.ResponseError as e:
-            print(f"Error checking model: {e}")
-            self.pull_model()
+        models = ollama.list()['models']
+        if self.model not in [m['name'] for m in models]:
+            logging.info(f"Pulling model {self.model}...")
+            ollama.pull(self.model)
+            logging.info(f"Model {self.model} pulled successfully.")
+        else:
+            logging.debug(f"Model {self.model} is already available.")
 
-    def pull_model(self):
-        try:
-            print(f"Pulling model {self.model}...")
-            response = ollama.pull(self.model)
-            if response['status'] == 'success':
-                print(f"Model {self.model} pulled successfully.")
-            else:
-                print(f"Failed to pull model {self.model}: {response}")
-        except ollama._types.ResponseError as e:
-            print(f"Error pulling model: {e}")
+        logging.info("Loading model into memory..")
 
-    def run(self, prompt, max_new_tokens=200, do_sample=True, temperature=0.5, top_p=0.95, use_cache=True,
-            repetition_penalty=1.1, **kwargs):
+    def run(self, prompt, **gen_params):
+        if self.stream_responses:
+            return self._stream_response(prompt, **gen_params)
+        else:
+            return self._generate_with_animation(prompt, **gen_params)
+
+    def _stream_response(self, prompt, **gen_params):
+        stream = ollama.chat(
+            model=self.model,
+            messages=prompt,
+            stream=True,
+            options=gen_params
+        )
+        response = ''
+        for chunk in stream:
+            print(chunk['message']['content'], end='', flush=True)
+            response += chunk['message']['content']
+        return response, len(response.split()), (None, len(response.split()))
+
+    def _generate_with_animation(self, prompt, **gen_params):
+        done = False
+
+        def animate():
+            for c in itertools.cycle(['|', '/', '-', '\\']):
+                if done:
+                    break
+                print(f'\rGenerating response... {c}', end='', flush=True)
+                time.sleep(0.1)
+
+        t = threading.Thread(target=animate)
+        t.start()
+
         response = ollama.chat(
             model=self.model,
             messages=prompt,
-            stream=False,  # Set to True if you want streaming responses
-            options={
-                'max_new_tokens': max_new_tokens,
-                'do_sample': do_sample,
-                'temperature': temperature,
-                'top_p': top_p,
-                'use_cache': use_cache,
-                'repetition_penalty': repetition_penalty,
-                **kwargs
-            }
-        )
-        content = response['message']['content']
-        input_len = len(prompt)
-        token_shape = (None, len(content))  # Adjust token_shape to be a tuple
+            stream=False,
+            options=gen_params
+        )['message']['content']
 
-        return [content], input_len, token_shape
+        done = True
+        t.join()
+        print('\r' + ' ' * 30, end='\r', flush=True)
+        print(response)
+        return response, len(response.split()), (None, len(response.split()))

@@ -2,18 +2,18 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-no_search: True
+no_search: False
 question: "apply a function to pandas column"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.ollama_pipeline.OllamaPipeline
     model: "stable-code"
 generation_params:
-    max_new_tokens: 400
-    do_sample: True
+#    max_new_tokens: 400
+#    do_sample: True
     temperature: 0.01
     top_p: 0.95
     use_cache: True
-    repetition_penalty: 1.1
+    repetition_penalty: 5
 model_token_limit: 16384
 precision: bfloat16
 history:

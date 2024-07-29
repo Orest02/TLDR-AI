@@ -1,37 +1,42 @@
 import datetime
-import logging
+import os
+
+import git
 import hydra
-from omegaconf import DictConfig
+import wandb
+from omegaconf import DictConfig, omegaconf
 from stackapi import StackAPI
+
 from tldrai.modules.pre_inference.pre_summarization import prepare_summarization_input
 from tldrai.modules.stack_overflow.fetch import fetch_answers_for_questions
 from tldrai.modules.stack_overflow.process import process_answers, process_questions
 from tldrai.modules.stack_overflow.search import search_stack_overflow_questions
 
-# Set up logging
-logger = logging.getLogger(__name__)
+from wandb.sdk.data_types.trace_tree import Trace
 
-def configure_logging(level):
-    logging.basicConfig(level=level)
-    logger.setLevel(level)
 
-@hydra.main(config_path="../config", config_name="config", version_base=None)
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig):
-    configure_logging(logging.DEBUG if cfg.get("verbatim", False) else logging.INFO)
+    # Initialize StackAPI with Hydra config
     start_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    logger.info("Starting process...")
 
+    wandb.config = omegaconf.OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
+
+    wandb.init(project="tldr-ai")
     SITE = StackAPI('stackoverflow')
+    repo = git.Repo(search_parent_directories=True)
     SITE.page_size = cfg.stack_overflow.page_size
 
     question = cfg.question
-    logger.info(f"Processing question: {question}")
 
+    # Initialize summarization pipeline
     summarizer = hydra.utils.instantiate(cfg.summarization_pipeline)
+
     system_prompt = '' if not cfg.prompt else cfg.prompt.format(question)
 
-    logger.debug("This is a test debug message from run.py")
-
+    # Fetch and preprocess data
     if cfg.no_search:
         summarization_input = ''
         fetch_time_ms = process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
@@ -50,6 +55,7 @@ def main(cfg: DictConfig):
                                                           token_limit=cfg.model_token_limit,
                                                           history_len=history_len
                                                           )
+
         process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
 
     summarization_input = prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt)
@@ -57,15 +63,19 @@ def main(cfg: DictConfig):
     generation_params = cfg.generation_params
     try:
         summary, input_len, token_shape = summarizer.run(summarization_input, **generation_params)
-        print("\n")  # to separate model summary from logs
-        logger.info("Summary generated successfully.")
-        end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+        print("Summary:", summary[0])
+        print("All Summary:", summary)
+        end_time_ms = round(
+            datetime.datetime.now().timestamp() * 1000
+        )
         status = "success"
         status_message = (None,)
         token_usage = token_shape[1]
-        output = summary[input_len:]
+        output = summary[0][input_len:]
     except Exception as e:
-        end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+        end_time_ms = round(
+            datetime.datetime.now().timestamp() * 1000
+        )  # logged in milliseconds
         status = "error"
         status_message = str(e)
         token_usage = 0
@@ -73,7 +83,7 @@ def main(cfg: DictConfig):
         output = ''
         input_len = 0
 
-        logger.error(f"Error: {status_message}")
+        print("Error:", status, status_message)
         raise
 
     run_params = dict(
@@ -84,6 +94,7 @@ def main(cfg: DictConfig):
         fetch_time_ms=fetch_time_ms - start_time_ms,
         process_time_ms=process_time_ms - fetch_time_ms,
         token_usage=token_usage,
+        git_hash=repo.head.object.hexsha,
         success=True if status == "success" else False,
         output='' if status == "error" else output,
         question=question,
@@ -94,7 +105,26 @@ def main(cfg: DictConfig):
         is_prompt_codified=cfg.is_prompt_codified
     )
 
-    logger.debug(f"Run parameters: {run_params}")
+    # for key, param in run_params.items():
+    #     wandb.log(key, param)
+
+    # create a span in wandb
+    root_span = Trace(
+        name="root_span",
+        kind="llm",  # kind can be "llm", "chain", "agent" or "tool"
+        status_code=status,
+        status_message=status_message,
+        metadata=run_params,
+        start_time_ms=start_time_ms,
+        end_time_ms=end_time_ms,
+        inputs={"system_prompt": system_prompt, "query": summarization_input},
+        outputs={"response": summary},
+    )
+
+    root_span.log(name="openai_trace")
+
+    wandb.log(run_params)
+    wandb.config.update(run_params)
 
 
 def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt):
@@ -102,6 +132,7 @@ def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prom
 
     if cfg.is_prompt_codified:
         if cfg.prompt:
+
             summarization_input = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content}
@@ -119,5 +150,11 @@ def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prom
 
         if cfg.history:
             summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
-
     return summarization_input
+
+
+if __name__ == "__main__":
+    wandb_key = open("keys/WANDB_KEY").read()
+    os.environ["WANDB_API_KEY"] = wandb_key
+
+    main()
