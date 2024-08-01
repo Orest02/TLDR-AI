@@ -14,3 +14,29 @@ def prepare_summarization_input(processed_answers, n=3, max_new_tokens=200, toke
         combined_text += answer_info
 
     return combined_text
+
+
+def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt):
+    user_content = summarization_input + cfg.prompt_ending.format(question)
+
+    if cfg.is_prompt_codified:
+        if cfg.prompt:
+            summarization_input = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content}
+            ]
+        else:
+            summarization_input = [
+                {"role": "user", "content": user_content}
+            ]
+
+        if cfg.history:
+            history = [{"role": key, "content": value} for key, value in cfg.history.items()]
+            summarization_input = history + summarization_input
+    else:
+        summarization_input = system_prompt + user_content
+
+        if cfg.history:
+            summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
+
+    return summarization_input

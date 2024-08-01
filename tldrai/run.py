@@ -3,34 +3,31 @@ import logging
 import hydra
 from omegaconf import DictConfig
 from stackapi import StackAPI
-from tldrai.modules.pre_inference.pre_summarization import prepare_summarization_input
+from tldrai.modules.pre_inference.pre_summarization import prepare_summarization_input, prepare_prompt_for_tokenizer
 from tldrai.modules.stack_overflow.fetch import fetch_answers_for_questions
 from tldrai.modules.stack_overflow.process import process_answers, process_questions
 from tldrai.modules.stack_overflow.search import search_stack_overflow_questions
+from tldrai.modules.utils.logging import configure_logging
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
-def configure_logging(level):
-    logging.basicConfig(level=level)
-    logger.setLevel(level)
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
-    configure_logging(logging.DEBUG if cfg.get("verbatim", False) else logging.INFO)
+    configure_logging(logging.DEBUG if cfg.get("verbose", False) else logging.INFO)
+
     start_time_ms = round(datetime.datetime.now().timestamp() * 1000)
-    logger.info("Starting process...")
+    logger.debug("Starting process...")
 
     SITE = StackAPI('stackoverflow')
     SITE.page_size = cfg.stack_overflow.page_size
 
     question = cfg.question
-    logger.info(f"Processing question: {question}")
+    logger.debug(f"Processing question: {question}")
 
     summarizer = hydra.utils.instantiate(cfg.summarization_pipeline)
     system_prompt = '' if not cfg.prompt else cfg.prompt.format(question)
-
-    logger.debug("This is a test debug message from run.py")
 
     if cfg.no_search:
         summarization_input = ''
@@ -57,8 +54,8 @@ def main(cfg: DictConfig):
     generation_params = cfg.generation_params
     try:
         summary, input_len, token_shape = summarizer.run(summarization_input, **generation_params)
-        print("\n")  # to separate model summary from logs
-        logger.info("Summary generated successfully.")
+        print("\n")
+        logger.debug("Summary generated successfully.")
         end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
         status = "success"
         status_message = (None,)
@@ -97,27 +94,3 @@ def main(cfg: DictConfig):
     logger.debug(f"Run parameters: {run_params}")
 
 
-def prepare_prompt_for_tokenizer(cfg, question, summarization_input, system_prompt):
-    user_content = summarization_input + cfg.prompt_ending.format(question)
-
-    if cfg.is_prompt_codified:
-        if cfg.prompt:
-            summarization_input = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_content}
-            ]
-        else:
-            summarization_input = [
-                {"role": "user", "content": user_content}
-            ]
-
-        if cfg.history:
-            history = [{"role": key, "content": value} for key, value in cfg.history.items()]
-            summarization_input = history + summarization_input
-    else:
-        summarization_input = system_prompt + user_content
-
-        if cfg.history:
-            summarization_input = "\n".join([v for k, v in cfg.history.items()]) + "\n" + summarization_input
-
-    return summarization_input

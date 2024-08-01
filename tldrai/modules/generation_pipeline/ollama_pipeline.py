@@ -1,26 +1,35 @@
+import itertools
 import logging
 
 import ollama
-import time
 import threading
-import itertools
+import time
+from tldrai.modules.utils.logging import configure_logging
+
 
 class OllamaPipeline:
-    def __init__(self, model, stream_responses=True):
-        self.model = model + ":latest"
+    def __init__(self, model, verbose=False, stream_responses=True, keep_alive='5m'):
+        self.model = model
+        self.verbose = verbose
         self.stream_responses = stream_responses
-        self.check_and_pull_model()
+        self.keep_alive = keep_alive
+        configure_logging(logging.DEBUG if self.verbose else logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        self.logger.debug(f"Initializing OllamaPipeline with model {self.model}")
 
-    def check_and_pull_model(self):
+        if not self.is_model_pulled(self.model):
+            self.pull_model(self.model)
+
+    def is_model_pulled(self, model_name):
         models = ollama.list()['models']
-        if self.model not in [m['name'] for m in models]:
-            logging.info(f"Pulling model {self.model}...")
-            ollama.pull(self.model)
-            logging.info(f"Model {self.model} pulled successfully.")
-        else:
-            logging.debug(f"Model {self.model} is already available.")
+        if ":" not in model_name:
+            model_name += ":latest"
+        return any(model['name'] == model_name for model in models)
 
-        logging.info("Loading model into memory..")
+    def pull_model(self, model_name):
+        self.logger.info(f"Pulling model {model_name}...")
+        ollama.pull(model_name)
+        self.logger.info(f"Model {model_name} pulled successfully.")
 
     def run(self, prompt, **gen_params):
         if self.stream_responses:
@@ -33,6 +42,7 @@ class OllamaPipeline:
             model=self.model,
             messages=prompt,
             stream=True,
+            keep_alive=self.keep_alive,
             options=gen_params
         )
         response = ''
@@ -58,6 +68,7 @@ class OllamaPipeline:
             model=self.model,
             messages=prompt,
             stream=False,
+            keep_alive=self.keep_alive,
             options=gen_params
         )['message']['content']
 

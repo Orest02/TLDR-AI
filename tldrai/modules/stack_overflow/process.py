@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import re
 
@@ -6,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from tldrai.modules.similarity_scoring.sentence_similarity import SentenceSimilarity
+from tldrai.modules.utils.logging import configure_logging
 
 
 def process_questions(questions):
@@ -49,12 +51,14 @@ def extract_and_merge_code_blocks(html_content, delimiter='```\n```', delimiter_
     return merged_code
 
 
-def process_answers(answers, questions, user_question):
+def process_answers(answers, questions, user_question, verbose=False):
+    configure_logging(logging.DEBUG if verbose else logging.INFO)
+    logger = logging.getLogger(__name__)
     questions = pd.DataFrame(questions).set_index("question_id")
     answers = pd.DataFrame(answers)
     answers = pd.merge(answers, questions["title"], left_on="question_id", right_index=True)
-    print(answers)
-    similarity = (SentenceSimilarity().compare_base_to_others(base_sentence=user_question, other_sentences=answers["title"].tolist())).numpy()
+    logger.debug(answers)
+    similarity = (SentenceSimilarity(verbose=verbose).compare_base_to_others(base_sentence=user_question, other_sentences=answers["title"].tolist())).numpy()
     answers["similarity"] = similarity[0]
     processed = []
     for _, answer in answers.sort_values(by="similarity", ascending=False).iterrows():

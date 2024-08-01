@@ -1,20 +1,26 @@
+import logging
+
 from sentence_transformers import util, SentenceTransformer
 
 from tldrai.modules.utils.gpu import check_gpu_memory
+from tldrai.modules.utils.logging import configure_logging
 
 
 class SentenceSimilarity:
-    def __init__(self, model_name='sentence-transformers/all-MiniLM-L6-v2'):
+    def __init__(self, model_name='sentence-transformers/all-MiniLM-L6-v2', verbose=False):
         """
         Initializes the SentenceSimilarity class with a specified transformer model.
 
         Args:
             model_name (str): The name of the sentence transformer model to be used. Defaults to 'sentence-transformers/all-MiniLM-L6-v2'.
         """
+        self.verbose = verbose
+        configure_logging(logging.DEBUG if self.verbose else logging.INFO)
+        self.logger = logging.getLogger(__name__)
         self.model_memory_used = 0.5  # GB
         free_memory = check_gpu_memory()
 
-        device = "cuda" if free_memory >= self.model_memory_used else "cpu"
+        device = None if free_memory >= self.model_memory_used else "cpu"  # None lets it run another internal check
         self.model = SentenceTransformer(model_name, device=device)
 
     def encode_sentences(self, sentences):
