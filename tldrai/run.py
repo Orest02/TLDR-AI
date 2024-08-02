@@ -20,11 +20,9 @@ def main(cfg: DictConfig):
     start_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     logger.debug("Starting process...")
 
-    SITE = StackAPI('stackoverflow')
-    SITE.page_size = cfg.stack_overflow.page_size
-
     question = cfg.question
     logger.debug(f"Processing question: {question}")
+    logger.debug(f"no_search set to: {cfg.no_search}")
 
     summarizer = hydra.utils.instantiate(cfg.summarization_pipeline)
     system_prompt = '' if not cfg.prompt else cfg.prompt.format(question)
@@ -33,7 +31,17 @@ def main(cfg: DictConfig):
         summarization_input = ''
         fetch_time_ms = process_time_ms = round(datetime.datetime.now().timestamp() * 1000)
     else:
-        questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
+        SITE = StackAPI('stackoverflow')
+        SITE.page_size = cfg.stack_overflow.page_size
+
+        try:
+            questions = search_stack_overflow_questions(SITE, question, num_questions=cfg.stack_overflow.num_questions)
+        except RuntimeError:
+            logger.error(
+                "\tNo questions found for the query. Try rephrasing and searching again. Alternatively, try asking the "
+                "LLM without the search.")
+            return
+
         questions = process_questions(questions)
         question_ids = [str(x['question_id']) for x in questions]
 
@@ -92,5 +100,3 @@ def main(cfg: DictConfig):
     )
 
     logger.debug(f"Run parameters: {run_params}")
-
-

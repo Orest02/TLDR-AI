@@ -1,5 +1,6 @@
 import itertools
 import logging
+import os
 
 import ollama
 import threading
@@ -49,7 +50,9 @@ class OllamaPipeline:
         for chunk in stream:
             print(chunk['message']['content'], end='', flush=True)
             response += chunk['message']['content']
-        return response, len(response.split()), (None, len(response.split()))
+        input_len = sum([len(x['content']) for x in prompt])
+        token_shape = (None, input_len+len(response))
+        return response, input_len, token_shape
 
     def _generate_with_animation(self, prompt, **gen_params):
         done = False
@@ -76,4 +79,7 @@ class OllamaPipeline:
         t.join()
         print('\r' + ' ' * 30, end='\r', flush=True)
         print(response)
-        return response, len(response.split()), (None, len(response.split()))
+
+        input_len = sum([len(x['content']) for x in prompt])
+        token_shape = (None, input_len + len(response))
+        return response, input_len, token_shape
