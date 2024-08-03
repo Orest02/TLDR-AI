@@ -21,9 +21,6 @@ install-poetry:
 setup: check-ollama check-poetry
 	@poetry install
 
-run:
-	@poetry run python -m your_cli_tool
-
 install: check-ollama check-poetry
 	@poetry install --no-dev
 
