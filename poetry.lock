@@ -393,7 +393,7 @@ files = [
 name = "click"
 version = "8.1.7"
 description = "Composable command line interface toolkit"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3476,4 +3476,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a9b6ee8508932c0f9af491067c1b9a5d224b821655f839f78a6d3ff63b5bf401"
+content-hash = "50cb0535685a59e1c7e7d38dbbf2573c61acf7b34f5275ace95d644a2f19a45e"
