@@ -1,15 +1,15 @@
 import itertools
 import logging
-import os
-
-import ollama
 import threading
 import time
+
+import ollama
+
 from tldrai.modules.utils.logging import configure_logging
 
 
 class OllamaPipeline:
-    def __init__(self, model, verbose=False, stream_responses=True, keep_alive='5m'):
+    def __init__(self, model, verbose=False, stream_responses=True, keep_alive="5m"):
         self.model = model
         self.verbose = verbose
         self.stream_responses = stream_responses
@@ -22,10 +22,10 @@ class OllamaPipeline:
             self.pull_model(self.model)
 
     def is_model_pulled(self, model_name):
-        models = ollama.list()['models']
+        models = ollama.list()["models"]
         if ":" not in model_name:
             model_name += ":latest"
-        return any(model['name'] == model_name for model in models)
+        return any(model["name"] == model_name for model in models)
 
     def pull_model(self, model_name):
         self.logger.info(f"Pulling model {model_name}...")
@@ -44,24 +44,24 @@ class OllamaPipeline:
             messages=prompt,
             stream=True,
             keep_alive=self.keep_alive,
-            options=gen_params
+            options=gen_params,
         )
-        response = ''
+        response = ""
         for chunk in stream:
-            print(chunk['message']['content'], end='', flush=True)
-            response += chunk['message']['content']
-        input_len = sum([len(x['content']) for x in prompt])
-        token_shape = (None, input_len+len(response))
+            print(chunk["message"]["content"], end="", flush=True)
+            response += chunk["message"]["content"]
+        input_len = sum([len(x["content"]) for x in prompt])
+        token_shape = (None, input_len + len(response))
         return response, input_len, token_shape
 
     def _generate_with_animation(self, prompt, **gen_params):
         done = False
 
         def animate():
-            for c in itertools.cycle(['|', '/', '-', '\\']):
+            for c in itertools.cycle(["|", "/", "-", "\\"]):
                 if done:
                     break
-                print(f'\rGenerating response... {c}', end='', flush=True)
+                print(f"\rGenerating response... {c}", end="", flush=True)
                 time.sleep(0.1)
 
         t = threading.Thread(target=animate)
@@ -72,14 +72,14 @@ class OllamaPipeline:
             messages=prompt,
             stream=False,
             keep_alive=self.keep_alive,
-            options=gen_params
-        )['message']['content']
+            options=gen_params,
+        )["message"]["content"]
 
         done = True
         t.join()
-        print('\r' + ' ' * 30, end='\r', flush=True)
+        print("\r" + " " * 30, end="\r", flush=True)
         print(response)
 
-        input_len = sum([len(x['content']) for x in prompt])
+        input_len = sum([len(x["content"]) for x in prompt])
         token_shape = (None, input_len + len(response))
         return response, input_len, token_shape
