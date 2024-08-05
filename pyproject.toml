@@ -19,27 +19,39 @@ ollama = "^0.2.1"
 beautifulsoup4 = "^4.12.3"
 lxml = "^5.1.0"
 sentence-transformers = "^2.5.1"
+click = "^8.1.7"
 
 [tool.poetry.scripts]
 tldrai = "cli:main_cli"
 
+[tool.poetry.group.phi-1_5_Wizard_Vicuna_uncensored]
+optional = true
 [tool.poetry.group.phi-1_5_Wizard_Vicuna_uncensored.dependencies]
 einops = "^0.7.0"
 
-
+[tool.poetry.group.wandb_experiment_tracking]
+optional = true
 [tool.poetry.group.wandb_experiment_tracking.dependencies]
 wandb = "^0.16.4"
 gitpython = "^3.1.42"
 
-
+[tool.poetry.group.gguf_stability_3b]
+optional = true
 [tool.poetry.group.gguf_stability_3b.dependencies]
 llama-cpp-python = "^0.2.61"
 
-
+[tool.poetry.group.test]
+optional = true
 [tool.poetry.group.test.dependencies]
 pyinstrument = "^4.6.2"
 pytest = "^8.3.2"
 pytest-mock = "^3.14.0"
+
+[tool.poetry.group.dev]
+optional = true
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.8.0"
+
 
 [build-system]
 requires = ["poetry-core"]

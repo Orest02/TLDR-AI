@@ -29,7 +29,7 @@ history:
         last_activity_date: 2021-11-05
         score: 571
         is_accepted: False
-        code: 
+        code:
         ```
         sorted(timestamps, reverse=True)
         ```
@@ -43,26 +43,26 @@ history:
         <pre><code>timestamps.sort(reverse=True)
         </code></pre>
         <p>Check the docs at <a href="https://docs.python.org/howto/sorting.html" rel="noreferrer">Sorting HOW TO</a></p>
-        
+
         Answer 2:
         question_title: Python list sort in descending order
         creation_date: 2010-11-15
         last_activity_date: 2020-12-04
         score: 427
         is_accepted: True
-        code: 
+        code:
         ```
-        lambda 
+        lambda
         ```
         ```
         timestamps.sort(key=lambda x: time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6], reverse=True) ```
         ```
-        list.sort 
+        list.sort
         ```
         ```
         def foo(x):
             return time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6]
-        
+
         timestamps.sort(key=foo, reverse=True)
         ```
         body: <p>In one line, using a <code>lambda</code>:</p>
@@ -72,19 +72,19 @@ history:
         <p>Passing a function to <code>list.sort</code>:</p>
         <pre><code>def foo(x):
             return time.strptime(x, '%Y-%m-%d %H:%M:%S')[0:6]
-        
+
         timestamps.sort(key=foo, reverse=True)
         </code></pre>
-        
+
         Answer 3:
         question_title: Sorting a Python list by two fields
         creation_date: 2013-06-14
         last_activity_date: 2021-08-05
         score: 460
         is_accepted: False
-        code: 
+        code:
         ```
-        list 
+        list
         ```
         ```
         sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
@@ -93,15 +93,15 @@ history:
         The following sorts <code>list</code> by the first element, then by the second element. You can also sort by one field ascending and another descending for example:</p>
         <pre class="lang-py prettyprint-override"><code>sorted_list = sorted(list, key=lambda x: (x[0], -x[1]))
         </code></pre>
-        
-        
+
+
         So, how do I sort python list?
         <empty_output>ASSISTANT
         This will sort your list in descending order:
         ```
         sorted(timestamps, reverse=True)
         ```
-        
+
         If you to sort in-place and descending order:
         ```
         timestamps.sort(reverse=True)
@@ -111,7 +111,7 @@ prompt: |
     <empty_output>SYSTEM Given a collection of StackOverflow answers related to [{}], please extract the most relevant piece of code. Give it as it is even if you think it's not correct. Start your answer with code. The non-code answer should be as short as possible.
     <empty_output>USER
 prompt_ending: |
-    
+
     So, how do I {}?
     <empty_output>ASSISTANT
 is_prompt_codified: False

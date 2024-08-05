@@ -23,4 +23,3 @@ setup: check-ollama check-poetry
 
 install: check-ollama check-poetry
 	@poetry install --no-dev
-
