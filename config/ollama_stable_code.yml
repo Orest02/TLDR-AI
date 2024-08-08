@@ -2,7 +2,9 @@ stack_overflow:
     page_size: 15
     num_questions: 5
     num_answers: 5
-no_search: False
+    search_style: excerpts  # excerpts or simple
+    tag: ""
+no_search: False  # False will not search StackOverflow
 question: "apply a function to pandas column"
 summarization_pipeline:
     _target_: tldrai.modules.generation_pipeline.ollama_pipeline.OllamaPipeline
@@ -10,16 +12,14 @@ summarization_pipeline:
     stream_responses: True
     verbose: False
     keep_alive: "5m"  #  keep the model in memory for this much time
-generation_params:
+generation_params:  # additional generation params
     max_new_tokens: 400
     do_sample: True
     temperature: 0.01
     top_p: 0.95
     use_cache: True
     repetition_penalty: 5
-    low_vram: false
-    main_gpu: 0
-model_token_limit: 16384
+model_token_limit: 16384  # Limit set for Stable code
 precision: bfloat16
 history:
     system: |
@@ -112,4 +112,4 @@ prompt: Given a collection of StackOverflow answers related to [{}], please extr
 prompt_ending: |
 
     So, how do I {}?
-is_prompt_codified: True
+is_prompt_codified: True  # If true, the prompt, history and prompt ending will be passed to the model as a dict.
