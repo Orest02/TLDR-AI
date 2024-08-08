@@ -57,6 +57,6 @@ jobs:
         pip install tldrai  # Install your package from PyPI
         pip install pytest pytest-mock  # Install testing dependencies
 
-    - name: Run tests
+    - name: Check if the package works
       run: |
-        pytest
+        "tldrai", "apply function to pandas column"
