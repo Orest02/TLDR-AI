@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from cli import main_cli
+from tldrai.cli import main_cli
 
 
 def test_cli_integration():

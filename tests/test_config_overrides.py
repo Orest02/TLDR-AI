@@ -1,6 +1,6 @@
 from omegaconf import OmegaConf
 
-from cli import apply_overrides
+from tldrai.cli import apply_overrides
 
 
 def test_apply_overrides():
