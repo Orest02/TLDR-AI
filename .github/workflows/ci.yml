@@ -1,4 +1,4 @@
-name: CI
+name: CI with poetry and PyPi
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test:
+  poetry:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,9 +29,34 @@ jobs:
 
       - name: Install Ollama
         run: |
-          # Example installation steps, replace with actual steps for your environment
           curl -sSL https://ollama.com/install.sh | bash
 
       - name: Run tests
         run: |
           poetry run pytest
+
+  pypi:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install Ollama
+      run: |
+        curl -sSL https://ollama.com/install.sh | bash
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tldrai  # Install your package from PyPI
+        pip install pytest pytest-mock  # Install testing dependencies
+
+    - name: Run tests
+      run: |
+        pytest

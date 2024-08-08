@@ -28,7 +28,7 @@ The TLDR AI CLI Tool is inspired by [howdoi](https://github.com/gleitz/howdoi). 
 
 ### Install Ollama
 
-Ollama is required for some functionalities of this tool. Please install Ollama according to your operating system by following the instructions provided in their [Quickstart Guide](https://github.com/ollama/ollama/blob/main/README.md#quickstart).
+Ollama is required for some functionalities of this tool. Please install Ollama according to your operating system by following the instructions provided in their [Documentation](https://github.com/ollama/ollama/blob/main/README.md#ollama).
 
 ### Install TLDR AI CLI Tool
 
@@ -64,6 +64,12 @@ tldrai apply function to pandas column --set summarization_pipeline.model=stable
 
 The TLDR AI CLI Tool is highly configurable. Configuration settings are managed through YAML files. Currently, the default configuration file used is `config/ollama_stable_code.yml`.
 
+## Forming questions
+I found two distinct ways to form the questions, depending on if you use StackOverflow search or not:
+- Without searching StackOverflow I found it more useful to form a full sentence (without the 'how to' part), for example `tldrai solve \'ModuleNotFound\' error`
+- To search StackOverflow (using the `-s` or `--search` flag) it's better to form a question as if you wanted to google it, for example `tldrai \'ModuleNotFound\' -s`
+
+The examples are simply for illustrative purpose and sometimes the question can be formed that simultaneously satisfies the both ways.
 ## Contributing
 
 We welcome contributions to the TLDR AI CLI Tool! If you have any suggestions or find any issues, please open an issue or subApache 2.0 a pull request on our [GitHub repository](https://github.com/yourusername/tldrai).

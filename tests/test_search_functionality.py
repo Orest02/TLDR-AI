@@ -1,5 +1,4 @@
 from click.testing import CliRunner
-
 from tldrai.cli import main_cli
 
 
@@ -9,6 +8,7 @@ def test_cli_integration():
         main_cli,
         [
             "apply function to pandas column",
+            "-s",
             "--set",
             "summarization_pipeline.model=stable-code",
         ],

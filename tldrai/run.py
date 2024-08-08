@@ -47,7 +47,11 @@ def main(cfg: DictConfig):
 
         try:
             questions = search_stack_overflow_questions(
-                SITE, question, num_questions=cfg.stack_overflow.num_questions
+                SITE,
+                question,
+                num_questions=cfg.stack_overflow.num_questions,
+                search_style=cfg.stack_overflow.search_style,
+                tag=cfg.stack_overflow.tag,
             )
         except RuntimeError:
             logger.error(
