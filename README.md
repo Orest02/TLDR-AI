@@ -72,7 +72,7 @@ I found two distinct ways to form the questions, depending on if you use StackOv
 The examples are simply for illustrative purpose and sometimes the question can be formed that simultaneously satisfies the both ways.
 ## Contributing
 
-We welcome contributions to the TLDR AI CLI Tool! If you have any suggestions or find any issues, please open an issue or subApache 2.0 a pull request on our [GitHub repository](https://github.com/yourusername/tldrai).
+We welcome contributions to the TLDR AI CLI Tool! If you have any suggestions or find any issues, please open an issue or subApache 2.0 a pull request on our [GitHub repository](https://github.com/Orest02/TLDR-AI).
 
 ## License
 
@@ -82,8 +82,8 @@ This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE
 
 - [Ollama](https://github.com/ollama/ollama)
 - [Hydra](https://github.com/facebookresearch/hydra)
-- [StackAPI](https://github.com/lukasz-madon/stackapi)
-- [WandB](https://www.wandb.com/)
+- [StackAPI](https://github.com/AWegnerGitHub/stackapi)
+- [WandB](https://www.wandb.com/) - for experimenting with prompts
 
 ---
 
