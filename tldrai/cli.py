@@ -4,7 +4,6 @@ import os
 
 import click
 from omegaconf import OmegaConf
-
 from tldrai.run import main
 
 # Set up logging
@@ -12,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def load_config(config_path):
+def load_config(config_path="ollama_stable_code.yml"):
     """Load configuration
 
     Args:
@@ -21,6 +20,9 @@ def load_config(config_path):
     Returns:
         OmegaConf: Configuration object
     """
+    print("dirname", os.path.dirname(__file__))
+    config_path = os.path.join(os.path.dirname(__file__), "..", "config", config_path)
+
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
     return OmegaConf.load(config_path)
@@ -68,9 +70,9 @@ def set_logger_level(verbose):
 @click.argument("question", nargs=-1)
 @click.option(
     "--config",
-    type=click.Path(exists=True),
-    default="config/ollama_stable_code.yml",
-    help="Path to config file",
+    type=str,
+    default="ollama_stable_code.yml",
+    help="Name of the config file",
 )
 @click.option(
     "--set",
