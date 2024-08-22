@@ -31,7 +31,7 @@ jobs:
     
     - name: Install testing dependencies
       run: |
-        poetry install --only test
+        pip install pytest pyinstrument pytest-mock
 
     - name: Test the package
       run: |
