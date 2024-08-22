@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'  # Use the appropriate Python version
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -28,7 +28,11 @@ jobs:
       run: |
         poetry install --no-dev
         poetry build
-    
+
+    - name: Install Ollama
+      run: |
+        curl -sSL https://ollama.com/install.sh | bash
+
     - name: Install testing dependencies
       run: |
         pip install pytest pyinstrument pytest-mock
@@ -50,14 +54,14 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'  # Ensure the same Python version
+        python-version: '3.11'
 
     - name: Install Poetry
       run: pip install poetry
 
     - name: Publish to PyPI
       env:
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}  # Set your PyPI token in the repo secrets
+        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
       run: |
         poetry publish --build --username __token__ --password $PYPI_TOKEN
 
