@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "tldrai"
-version = "0.2.1"
-description = ""
+version = "0.2.4"
+description = "CLI tool to give quick step-by-step answers to tech questions. Powered by the LLMs and StackOverflow."
 authors = ["omalinovskyi <orest0206@gmail.com>"]
 readme = "README.md"
+include = ["config/*"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -29,11 +30,6 @@ optional = true
 [tool.poetry.group.wandb_experiment_tracking.dependencies]
 wandb = "^0.16.4"
 gitpython = "^3.1.42"
-
-[tool.poetry.group.gguf_stability_3b]
-optional = true
-[tool.poetry.group.gguf_stability_3b.dependencies]
-llama-cpp-python = "^0.2.61"
 
 [tool.poetry.group.test]
 optional = true

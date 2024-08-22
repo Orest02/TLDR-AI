@@ -66,13 +66,13 @@ The TLDR AI CLI Tool is highly configurable. Configuration settings are managed 
 
 ## Forming questions
 I found two distinct ways to form the questions, depending on if you use StackOverflow search or not:
-- Without searching StackOverflow I found it more useful to form a full sentence (without the 'how to' part), for example `tldrai solve \'ModuleNotFound\' error`
+- Without searching StackOverflow I found it more useful to form a full sentence (omitting the 'how to' part), for example `tldrai solve \'ModuleNotFound\' error`
 - To search StackOverflow (using the `-s` or `--search` flag) it's better to form a question as if you wanted to google it, for example `tldrai \'ModuleNotFound\' -s`
 
-The examples are simply for illustrative purpose and sometimes the question can be formed that simultaneously satisfies the both ways.
+The examples are simply for illustrative purpose only and sometimes the question can be formed in a way that simultaneously satisfies the both ways described above.
 ## Contributing
 
-We welcome contributions to the TLDR AI CLI Tool! If you have any suggestions or find any issues, please open an issue or subApache 2.0 a pull request on our [GitHub repository](https://github.com/yourusername/tldrai).
+We welcome contributions to the TLDR AI CLI Tool! If you have any suggestions or find any issues, please open an issue or subApache 2.0 a pull request on our [GitHub repository](https://github.com/Orest02/TLDR-AI).
 
 ## License
 
@@ -82,8 +82,8 @@ This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE
 
 - [Ollama](https://github.com/ollama/ollama)
 - [Hydra](https://github.com/facebookresearch/hydra)
-- [StackAPI](https://github.com/lukasz-madon/stackapi)
-- [WandB](https://www.wandb.com/)
+- [StackAPI](https://github.com/AWegnerGitHub/stackapi)
+- [WandB](https://www.wandb.com/) - for experimenting with prompts
 
 ---
 
