@@ -24,22 +24,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
 
-    - name: Build wheel
+    - name: Install packages
       run: |
-        poetry install --no-dev
-        poetry build
+        poetry lock && poetry install --with test
 
     - name: Install Ollama
       run: |
         curl -sSL https://ollama.com/install.sh | bash
 
-    - name: Install testing dependencies
-      run: |
-        pip install pytest pyinstrument pytest-mock
-
     - name: Test the package
       run: |
-        pip install dist/*.whl
         pytest  # Adjust if you need to run tests differently
 
   publish:
