@@ -11,7 +11,7 @@ summarization_pipeline:
     model: "stable-code"
     stream_responses: True
     verbose: False
-    keep_alive: "5m"  #  keep the model in memory for this much time
+    keep_alive: "30m"  #  keep the model in memory for this much time
 generation_params:  # additional generation params
     max_new_tokens: 400
     do_sample: True
